@@ -24,21 +24,21 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # 
 # *****************************************************************************
-import os
+"""
+Tests that the NV-WaveNet class is producing audio
+"""
 import torch
-from setuptools import setup
-from torch.utils.cpp_extension import BuildExtension, CUDAExtension
+from scipy.io.wavfile import write
+import nv_wavenet
+import utils
 
-abs_path = os.path.dirname(os.path.realpath(__file__))
-library_dirs = [abs_path]
-extra_libraries = ['wavenet_infer']
-extra_includes = [abs_path]
-
-setup(name='nv_wavenet_ext',
-      ext_modules=[CUDAExtension(name='nv_wavenet_ext',
-                                 sources=['wavenet_infer_wrapper.cpp'],
-                                 library_dirs=library_dirs,
-                                 runtime_library_dirs=library_dirs,
-                                 libraries=extra_libraries,
-                                 include_dirs=extra_includes)],
-      cmdclass={'build_ext': BuildExtension})
+if __name__ == '__main__':
+    model = torch.load("model.pt")
+    wavenet = nv_wavenet.NVWaveNet(**model)
+    cond_input = torch.load("cond_input.pt")
+    samples = wavenet.infer(cond_input, nv_wavenet.Impl.PERSISTENT)[0]
+    
+    audio = utils.mu_law_decode_numpy(samples.cpu().numpy(), 256)
+    audio = utils.MAX_WAV_VALUE * audio
+    wavdata = audio.astype('int16')
+    write('audio.wav',16000, wavdata)
