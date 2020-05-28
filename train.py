@@ -140,11 +140,11 @@ def train(num_gpus, rank, group_name, output_directory, epochs, learning_rate,
             if num_gpus > 1:
                 reduced_loss = reduce_tensor(loss.data, num_gpus)[0]
             else:
-                reduced_loss = loss.data[0]
+                reduced_loss = loss.item()
             loss.backward()
             optimizer.step()
 
-            print("{}:\t{:.9f}".format(iteration, reduced_loss))
+            print("{}:\t{:.4f}".format(iteration, reduced_loss))
 
             if (iteration % iters_per_checkpoint == 0):
                 if rank == 0:

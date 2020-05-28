@@ -1,6 +1,6 @@
 {
     "train_config": {
-        "output_directory": "checkpoints",
+        "output_directory": "exp/jingming/models/wavenet",
         "epochs": 100000,
         "learning_rate": 1e-3,
         "iters_per_checkpoint": 1000,
@@ -10,7 +10,7 @@
     },
 
     "data_config": {
-        "training_files": "train_files.txt",
+        "training_files": "exp/jingming/corpus/train_files.txt",
         "segment_length": 16000,
         "mu_quantization": 256,
         "filter_length": 800,
